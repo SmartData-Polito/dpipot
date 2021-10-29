@@ -1,0 +1,13 @@
+[Unit]
+Description=Honeypot and Darknet Capture Service
+After=network.target
+
+[Service]
+Restart=always
+RestartSec=30
+Environment="TCPDUMP_FORMAT=%%Y-%%m-%%d__%%H-%%M"
+ExecStart=/bin/bash PREFIX/bin/capture.sh PREFIX
+ExecStop=/bin/kill -s QUIT $MAINPID
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,32 @@
+honeypots:
+    l4responder:
+      type: "l4responder"
+      address: "127.0.0.1"
+      port: "1313"
+    apache-http:
+      type: "vm"
+      image: "apache-http"
+      address: "127.0.0.1"
+      port: "80"
+    server_ssh:
+      type: "vm"
+      image: "honeypot-cowrie"
+      address: "127.0.0.1"
+      port: "22"
+    dpipot:
+      type: "dpi"
+      address: "127.0.0.1"
+      port: "1212"
+      backend:
+          ssh:     "server_ssh"
+          http:    "apache-http"
+          default: "l4responder"
+iptables_rules:
+    - honeypot: "l4responder"
+      ip_dst: "127.0.0.1/0"
+      proto: "tcp"
+      ports: "60000:65535"
+    - honeypot: "dpipot"
+      ip_dst: "127.0.0.1/0"
+      proto: "tcp"
+      ports: "20000:21000"

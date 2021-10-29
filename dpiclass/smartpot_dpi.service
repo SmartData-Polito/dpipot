@@ -1,0 +1,13 @@
+[Unit]
+Description=honeypot dpi service
+After=syslog.target network.target smartpot_capture.service
+
+[Service]
+Restart=always
+RestartSec=30
+ExecStart=/usr/bin/unbuffer PREFIX/bin/classifier
+StandardOutput=append:PREFIX/log/dpi_backend.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target

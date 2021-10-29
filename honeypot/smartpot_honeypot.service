@@ -1,0 +1,12 @@
+[Unit]
+Description=honeypot service
+After=syslog.target network.target smartpot_dpi.service smartpot_capture.service
+
+[Service]
+Restart=always
+RestartSec=30
+ExecStart=/bin/bash PREFIX/bin/honeypot.sh PREFIX
+ExecStop=/bin/kill -s QUIT $MAINPID
+
+[Install]
+WantedBy=multi-user.target

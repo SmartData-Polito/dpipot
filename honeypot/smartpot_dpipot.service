@@ -1,0 +1,12 @@
+[Unit]
+Description=honeypot service
+After=smartpot_honeypot.service
+
+[Service]
+Restart=always
+RestartSec=30
+ExecStart=PREFIX/bin/dpipot.py -c PREFIX/etc/honeypot.yml -l PREFIX/log/
+ExecStop=/bin/kill -s QUIT $MAINPID
+
+[Install]
+WantedBy=multi-user.target
