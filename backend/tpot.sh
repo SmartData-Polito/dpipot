@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "$#" -ne 4 ]; then
+if [ "$#" -ne 0 ]; then
     echo "Illegal number of parameters. Usage:
 tpot.sh"
     exit 1

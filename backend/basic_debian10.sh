@@ -25,9 +25,9 @@ cat basic_debian10.cfg | sed s/PASSWORD/$PASSWORD/g > /tmp/preseed.cfg
 virt-install \
     --name $NAME_FINAL \
     --description $NAME_FINAL \
-    --ram 131456 \
-    --vcpus 24 \
-    --disk path=$INSTALL_PATH/$NAME_FINAL.img,size=500 \
+    --ram 2048 \
+    --vcpus 4 \
+    --disk path=$INSTALL_PATH/$NAME_FINAL.img,size=50 \
     --os-type linux  \
     --os-variant debian10 \
     --graphics none \
