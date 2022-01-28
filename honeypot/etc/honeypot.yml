@@ -23,10 +23,10 @@ honeypots:
           default: "l4responder"
 iptables_rules:
     - honeypot: "l4responder"
-      ip_dst: "127.0.0.1/0"
+      ip_dst: "127.0.0.1/32"
       proto: "tcp"
       ports: "60000:65535"
     - honeypot: "dpipot"
-      ip_dst: "127.0.0.1/0"
+      ip_dst: "127.0.0.1/32"
       proto: "tcp"
       ports: "20000:21000"
