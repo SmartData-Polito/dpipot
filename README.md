@@ -1,6 +1,6 @@
-# SmartPot
+# DPIPot
 
-SmartPot orchestrates honeypot systems, steering traffic to diverse backends based on flexible rules. SmartPot includes:
+DPIPot orchestrates honeypot systems, steering traffic to diverse backends based on flexible rules. It includes:
 
 - Flexible steering of traffic to backend systems (built on top of `iptables` rules).
 - Layer4 Responder: a responder that opens TCP connections and saves the first packet with payload in each flow.
