@@ -30,7 +30,6 @@ This will invoke the Python backend script for honeypot 1 ...
 | miner        |    |        |    x   |    x    |
 | spammer      |  x |        |        |         |
 | zombie mirai |  x |        |        |         |
-
 ```
 
 - [ ] *L4*
