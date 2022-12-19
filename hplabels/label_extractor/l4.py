@@ -8,8 +8,8 @@ class L4Parser(HoneypotParser):
         # Process
         return logs
 
-    def _extract_spammer_label(self, label1='benign', label2='crawler', 
-                               label3='unk_cralwer'):
+    def _extract_spammer_label(self, label1='malicious', label2='spammer', 
+                               label3='unk_spammer'):
         spammer_ips = [('ip', label1, label2, label3)]
         # Process
         return spammer_ips
