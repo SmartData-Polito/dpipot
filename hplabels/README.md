@@ -21,15 +21,15 @@ This will invoke the Python backend script for honeypot 1 ...
 ## Supported Honeypots and Labels
 
 ```
-|    Label     | L4 |            L7-Honeypot         |
-|--------------|:--:|:-----------:|:------:|:-------:|
-|              |    |    Tanner   | Cowrie | Dionaea |
-| crawler      |    |      x      |        |         |
-| bruteforcer  |    |             |    x   |    x    |
-| exploiter    |    |             |    x   |    x    |
-| miner        |    |             |    x   |    x    |
-| spammer      |  x |             |        |         |
-| zombie mirai |  x |             |        |         |
+|    Label     | L4 |       L7-Honeypot         |
+|--------------|:--:|:------:|:------:|:-------:|
+|              |    | Tanner | Cowrie | Dionaea |
+| crawler      |    |   x    |        |         |
+| bruteforcer  |    |        |    x   |    x    |
+| exploiter    |    |        |    x   |    x    |
+| miner        |    |        |    x   |    x    |
+| spammer      |  x |        |        |         |
+| zombie mirai |  x |        |        |         |
 
 ```
 
