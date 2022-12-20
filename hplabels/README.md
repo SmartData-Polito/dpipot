@@ -40,8 +40,8 @@ This will invoke the Python backend script for honeypot 1 ...
     - [x] crawler: if a entry (sender) in the JSON-formatted log of the Tanner 
     honeypot searched for `robot.txt` it is labelled as `(benign, crawler)`
 - [ ] *Cowrie* 
-    - [ ] bruteforcer: TBD
-    - [ ] exploiter: TBD
+    - [x] bruteforcer: TBD
+    - [x] exploiter: TBD
     - [ ] miner: TBD
 - [ ] *Dionaea* 
     - [ ] bruteforcer: TBD
