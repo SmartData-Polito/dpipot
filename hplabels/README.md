@@ -33,17 +33,17 @@ This will invoke the Python backend script for honeypot 1 ...
 ```
 
 - [ ] *L4*
-    - spammer: TBD
-    - zombie: TBD
-        - mirai: TBD
-- [ ] *Tanner* 
-    - crawler: if a entry (sender) in the JSON-formatted log of the Tanner 
+    - [ ] spammer: TBD
+    - [ ] zombie: TBD
+         mirai: TBD
+- [x] *Tanner* 
+    - [x] crawler: if a entry (sender) in the JSON-formatted log of the Tanner 
     honeypot searched for `robot.txt` it is labelled as `(benign, crawler)`
 - [ ] *Cowrie* 
-    - bruteforcer: TBD
-    - exploiter: TBD
-    - miner: TBD
+    - [ ] bruteforcer: TBD
+    - [ ] exploiter: TBD
+    - [ ] miner: TBD
 - [ ] *Dionaea* 
-    - bruteforcer: TBD
-    - exploiter: TBD
-    - miner: TBD
+    - [ ] bruteforcer: TBD
+    - [ ] exploiter: TBD
+    - [ ] miner: TBD
