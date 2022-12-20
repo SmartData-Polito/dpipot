@@ -53,18 +53,18 @@ class CowrieParser(HoneypotParser):
         """
         Extract the IP addresses of crawlers from the logs.
         """
-        # Extract the IP addresses of crawlers from the logs
+        # Extract the IP addresses of bruteforcers from the logs
         bfs = []
         for entry in self.logs:
             try:
-                # Check if the entry contains 'robots.txt'
+                # Check if the entry contains the word `login`
                 if 'login' in entry:
                     # Parse the entry as JSON and extract the source IP address
                     obj = json.loads(entry)
                     src_ip = obj['src_ip']
 
-                    # Add the IP address to the list of crawlers if it's not 
-                    # '10.0.0.1'
+                    # Add the IP address to the list of btuteforcers if it's 
+                    # not '10.0.0.1'
                     if src_ip != '10.0.0.1':
                         label = (src_ip, label1, label2, f'unk_{label2}')
                         bfs.append(label)
@@ -74,6 +74,7 @@ class CowrieParser(HoneypotParser):
         
         # Trim the entries according to the number of login attempts
         bfs = self._get_ips_frequency(bfs)
+        bfs = [tuple(x) for x in bfs]
 
         return bfs
 
@@ -91,7 +92,7 @@ class CowrieParser(HoneypotParser):
                     obj = json.loads(entry)
                     src_ip = obj['src_ip']
 
-                    # Add the IP address to the list of crawlers if it's not 
+                    # Add the IP address to the list of exploiters if it's not 
                     # '10.0.0.1'
                     if src_ip != '10.0.0.1':
                         label = (src_ip, label1, label2, f'unk_{label2}')
@@ -110,12 +111,15 @@ class CowrieParser(HoneypotParser):
         """
         # Extract the IP addresses labeled as bruteforcer from the log data
         bfs_ips = self._extract_bruteforcer_label()
-        # Extract the IP addresses labeled as bruteforcer from the log data
+        # Extract the IP addresses labeled as expliter from the log data
         expl_ips = self._extract_exploiter_label()
         
+        # Concatenate labels
+        cowrie_all = bfs_ips + expl_ips
+
         # If an output file path has been specified, save the labels to the file
         if self.outpath:
-            self.save_labels(bfs_ips)
+            self.save_labels(cowrie_all)
 
         # Return the list of tuples containing the IP addresses and labels
-        return bfs_ips, expl_ips
+        return cowrie_all

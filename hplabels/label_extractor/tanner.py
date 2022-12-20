@@ -2,6 +2,7 @@ from .parser import HoneypotParser
 import gzip
 from io import BytesIO
 import json
+import subprocess
 
 class TannerParser(HoneypotParser):
     """
@@ -75,16 +76,45 @@ class TannerParser(HoneypotParser):
 
         return crawlers
 
+    def _extract_zombie_log4j_label(
+            self, label1='malicious', label2='zombie'):
+        """
+        Extract the IP addresses of log4j zombie from the logs.
+        """
+        # Extract the IP addresses from the logs
+        log4j = []
+        for entry in self.logs:
+            # Check if the entry contains 'robots.txt'
+            if 'jndi:ldap' in entry:
+                # Parse the entry as JSON and extract the source IP address
+                obj = json.loads(entry)
+                src_ip = obj['peer']['ip']
+
+                # Add the IP address to the list of crawlers if it's not 
+                # '10.0.0.1'
+                if src_ip != '10.0.0.1':
+                    label = (src_ip, 'malicious', 'zombie', 'log4j')
+                    # Get only unique senders
+                    if label not in log4j:
+                        log4j.append(label)
+
+        return log4j
+
     def extract_labels(self):
         """
         Extract crawler labels from the Tanner log data.
         """
         # Extract the IP addresses labeled as crawler from the log data
         crawler_ips = self._extract_crawler_label()
+        # Extract the IP addresses labeled as zombie-log4j from the log data
+        log4j_ips = self._extract_zombie_log4j_label()
         
+        # Concatenate labels
+        tanner_all = crawler_ips + log4j_ips
+
         # If an output file path has been specified, save the labels to the file
         if self.outpath:
-            self.save_labels(crawler_ips)
+            self.save_labels(tanner_all)
 
         # Return the list of tuples containing the IP addresses and labels
-        return crawler_ips
+        return tanner_all

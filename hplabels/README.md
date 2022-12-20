@@ -30,18 +30,25 @@ This will invoke the Python backend script for honeypot 1 ...
 | miner        |    |        |    x   |    x    |
 | spammer      |  x |        |        |         |
 | zombie mirai |  x |        |        |         |
+| zombie log4j |  x |   x    |        |         |
 ```
 
 - [ ] *L4*
     - [ ] spammer: TBD
-    - [ ] zombie: TBD
-         mirai: TBD
+    - [ ] zombie: sender exhibiting the fingerprint of known malwares
+        - mirai: if a entry (sender) in the L4 log sent all of its packets 
+         exhibiting the Mirai fingerprint (provided that it sent >=5 packets)
 - [x] *Tanner* 
     - [x] crawler: if a entry (sender) in the JSON-formatted log of the Tanner 
     honeypot searched for `robot.txt` it is labelled as `(benign, crawler)`
+    - [x] zombie: sender exhibiting the fingerprint of known malwares
+        - log4j: if a entry (sender) in the Tanner log sent all of its packets 
+         exhibiting the log4j fingerprint
 - [ ] *Cowrie* 
-    - [x] bruteforcer: TBD
-    - [x] exploiter: TBD
+    - [x] bruteforcer: if a entry (sender) in the JSON-formatted log of the 
+    Cowrie honeypot tried more than 20 login attempts
+    - [x] exploiter: if a entry (sender) in the JSON-formatted log of the 
+    Cowrie honeypot tried to download something
     - [ ] miner: TBD
 - [ ] *Dionaea* 
     - [ ] bruteforcer: TBD
