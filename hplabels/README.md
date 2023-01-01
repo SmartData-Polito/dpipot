@@ -30,12 +30,12 @@ This will invoke the Python backend script for honeypot 1 ...
 | miner        |    |        |    x   |    x    |
 | spammer      |  x |        |        |         |
 | zombie mirai |  x |        |        |         |
-| zombie log4j |  x |   x    |        |         |
+| zombie log4j |    |   x    |        |         |
 ```
 
 - [ ] *L4*
-    - [ ] spammer: TBD
-    - [ ] zombie: sender exhibiting the fingerprint of known malwares
+    - [x] spammer: TBD
+    - [x] zombie: sender exhibiting the fingerprint of known malwares
         - mirai: if a entry (sender) in the L4 log sent all of its packets 
          exhibiting the Mirai fingerprint (provided that it sent >=5 packets)
 - [x] *Tanner* 
@@ -51,6 +51,6 @@ This will invoke the Python backend script for honeypot 1 ...
     Cowrie honeypot tried to download something
     - [ ] miner: TBD
 - [ ] *Dionaea* 
-    - [ ] bruteforcer: TBD
-    - [ ] exploiter: TBD
+    - [x] bruteforcer: TBD
+    - [x] exploiter: TBD
     - [ ] miner: TBD
