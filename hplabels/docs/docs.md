@@ -21,7 +21,7 @@ The TannerParser class is a subclass of HoneypotParser that is specifically desi
 
 #### Examples
 ```python
-from label_extractor.tanner import TannerParser
+from label_extractor import TannerParser
 
 extractor = TannerParser(input_file, output_file)
 extractor.extract_labels()
@@ -35,7 +35,7 @@ The L4Parser class is a subclass of HoneypotParser that is designed for parsing 
 
 #### Examples
 ```python
-from label_extractor.l4 import L4Parser
+from label_extractor import L4Parser
 
 extractor = L4Parser(input_file, output_file)
 extractor.extract_labels()
@@ -49,7 +49,7 @@ The DionaeaParser class is used for parsing and extracting labels from Dionaea l
 
 #### Examples
 ```python
-from label_extractor.dionaea import DionaeaParser
+from label_extractor import DionaeaParser
 
 extractor = DionaeaParser(input_file, output_file)
 extractor.extract_labels()
@@ -62,7 +62,7 @@ The CowrieParser class is used for parsing and extracting labels from Cowrie log
 
 #### Examples
 ```python
-from label_extractor.dionaea import DionaeaParser
+from label_extractor import DionaeaParser
 
 extractor = DionaeaParser(input_file, output_file)
 extractor.extract_labels()
