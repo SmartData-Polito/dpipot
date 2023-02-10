@@ -122,7 +122,7 @@ class CowrieParser(HoneypotParser):
         return entries
 
 
-    def _extract_bruteforcer_label(self, label1, label2, label3):
+    def _extract_bruteforcer_label(self, label1=None, label2=None, label3=None):
         """
         Extract the IP addresses of bruteforcers from the logs.
 
@@ -174,7 +174,7 @@ class CowrieParser(HoneypotParser):
 
         return bfs
 
-    def _extract_exploiter_label(self, label1, label2, label3):
+    def _extract_exploiter_label(self, label1=None, label2=None, label3=None):
         """
         Extract the IP addresses of exploiters from the logs.
 

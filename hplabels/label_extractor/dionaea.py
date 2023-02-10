@@ -50,7 +50,7 @@ class DionaeaParser(HoneypotParser):
         self.filepath = filepath
         self.outpath = outpath
 
-    def _extract_bruteforcer_label(self, label1, label2, label3):
+    def _extract_bruteforcer_label(self, label1=None, label2=None, label3=None):
         """
         Extract IPs labeled as bruteforcer from the log data.
 
@@ -75,16 +75,13 @@ class DionaeaParser(HoneypotParser):
         label3 = label3 or 'unk_bruteforcer'
 
         # Uncompress the file and store it in /tmp/dionaea_parser
-        os.system(f'zcat {self.filepath} > /tmp/dionaea_parser')
-
-        # Execute a SQL query on the uncompressed file and store the results in
-        # /tmp/test.txt
-        os.system('echo "select * from logins inner join connections '
+        os.system(f'cp {self.filepath} /tmp/dionaea.sqlite.gz && gunzip /tmp/dionaea.sqlite.gz && '
+                  'echo "select * from logins inner join connections '
                   'on logins.connection = connections.connection;" | ' 
-                  'sqlite3 /tmp/dionaea_parser -header -csv > /tmp/test.txt')
+                  'sqlite3 /tmp/dionaea.sqlite -header -csv > /tmp/test.txt')
 
         # Remove the uncompressed file
-        os.system(f'rm -rf /tmp/dionaea_parser')
+        os.system(f'rm -rf /tmp/dionaea.sqlite')
 
         # Read the results of the SQL query into a Pandas DataFrame and count 
         # the number of occurrences of each value in the 'remote_host' column
@@ -109,7 +106,7 @@ class DionaeaParser(HoneypotParser):
 
         return bfs
 
-    def _extract_exploiter_label(self, label1, label2, label3):
+    def _extract_exploiter_label(self, label1=None, label2=None, label3=None):
         """
         Extract IPs labeled as exploiter from the log data.
 
@@ -134,16 +131,13 @@ class DionaeaParser(HoneypotParser):
         label3 = label3 or 'unk_exploiter'
 
         # Uncompress the file and store it in /tmp/dionaea_parser
-        os.system(f'zcat {self.filepath} > /tmp/dionaea_parser')
-
-        # Execute a SQL query on the uncompressed file and store the results in 
-        # /tmp/test.txt
-        os.system('echo "select * from downloads inner join connections '
+        os.system(f'cp {self.filepath} /tmp/dionaea.sqlite.gz && gunzip /tmp/dionaea.sqlite.gz && '
+                  'echo "select * from downloads inner join connections '
                   'on downloads.connection = connections.connection;" | ' 
-                  'sqlite3 /tmp/dionaea_parser -header -csv > /tmp/test.txt')
+                  'sqlite3 /tmp/dionaea.sqlite -header -csv > /tmp/test.txt')
         
         # Remove the uncompressed file
-        os.system(f'rm -rf /tmp/dionaea_parser')
+        os.system(f'rm -rf /tmp/dionaea.sqlite')
 
         # Read the results of the SQL query into a Pandas DataFrame and count 
         # the number of occurrences of each value in the 'remote_host' column

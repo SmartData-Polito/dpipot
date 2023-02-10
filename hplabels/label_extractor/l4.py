@@ -18,9 +18,10 @@ import multiprocessing
 import glob
 import pandas as pd
 import numpy as np
+import os
 
 class L4Parser(HoneypotParser):
-    def __init__(self, filepath, outpath=None):
+    def __init__(self, filepath, outpath=None, file_list=False):
         """
         A subclass of HoneypotParser for parsing honypot log files generated at 
         layer 4. This subclass implements specific logic for extracting labels 
@@ -56,6 +57,7 @@ class L4Parser(HoneypotParser):
         """
         self.filepath = filepath
         self.outpath = outpath
+        self.file_list = file_list
 
     def _process_single_file_spam(self, fpath):
         """
@@ -73,11 +75,19 @@ class L4Parser(HoneypotParser):
         """
         # Start a subprocess that runs the 'zcat' command and pipes its output 
         # to the 'awk' process
-        zcat_process = subprocess.Popen(
-                        ['zcat', fpath],
-                        stdout=subprocess.PIPE
-                    )
+        if not self.file_list:
+            zcat_process = subprocess.Popen(
+                                ['zcat', fpath],
+                                stdout=subprocess.PIPE
+                            )
+        else:
+            for _file in fpath.split(' '):
+                os.system(f'zcat {_file} >> /tmp/dkbr.log')
         
+            zcat_process = subprocess.Popen(
+                                    ['cat', '/tmp/dkbr.log'],
+                                    stdout=subprocess.PIPE
+                                )
         # Create a subprocess running the 'awk' command, which filters the 
         # input by searching for lines where the 6th field ($6) is equal to 25, 
         # 110, 143, 465, 993, or 995, and then prints the 3rd, 6th, and 8th 
@@ -99,7 +109,7 @@ class L4Parser(HoneypotParser):
         
         return out
 
-    def _extract_spammer_label(self, label1, label2, label3):
+    def _extract_spammer_label(self, label1=None, label2=None, label3=None):
         """
         Extracts spammer labels from the log data.
         
@@ -130,9 +140,11 @@ class L4Parser(HoneypotParser):
         pool = multiprocessing.Pool(multiprocessing.cpu_count())
         # Process the log data using the _process_single_file_spam method on 
         # each file in the specified filepath
-        res = pool.map(self._process_single_file_spam, glob.glob(self.filepath))
+        if not self.file_list:
+            res = pool.map(self._process_single_file_spam, glob.glob(self.filepath))
+        else:
+            res = pool.map(self._process_single_file_spam, self.filepath.split(' '))
         pool.close() # Close the process pool
-
         # Split the processed log data by newline, and then split each line by 
         # space
         to_df = [x.split(' ') for x in '\n'.join(res).split('\n')]
@@ -140,7 +152,7 @@ class L4Parser(HoneypotParser):
         # 'src_ip', 'dst_port', 'bytes_len'
         df = pd.DataFrame(to_df, columns=['src_ip', 'dst_port', 'bytes_len'])
         # Convert the 'bytes_len' column to integer type
-        df['bytes_len'] = df['bytes_len'].astype(int)
+        df['bytes_len'] = df['bytes_len'].replace({'-':-1}).astype(int)
         # Filter the dataframe by rows where 'bytes_len' is greater than or 
         # equal to 80
         _filter = df['src_ip'][df['bytes_len']>=80]
@@ -175,10 +187,19 @@ class L4Parser(HoneypotParser):
         """
         # Start a subprocess that runs the 'zcat' command and pipes its output 
         # to the 'awk' process
-        zcat_process = subprocess.Popen(
-                        ['zcat', fpath],
-                        stdout=subprocess.PIPE
-                    )
+        if not self.file_list:
+            zcat_process = subprocess.Popen(
+                                ['zcat', fpath],
+                                stdout=subprocess.PIPE
+                            )
+        else:
+            for _file in fpath.split(' '):
+                os.system(f'zcat {_file} >> /tmp/dkbr.log')
+        
+            zcat_process = subprocess.Popen(
+                                    ['cat', '/tmp/dkbr.log'],
+                                    stdout=subprocess.PIPE
+                                )
         # Create a subprocess running the 'awk' command, which prints the 3rd 
         # and 10th fields of the input
         awk_process = subprocess.Popen(
@@ -205,7 +226,7 @@ class L4Parser(HoneypotParser):
 
         return df
 
-    def _extract_zombie_mirai_label(self, label1, label2, label3):
+    def _extract_zombie_mirai_label(self, label1=None, label2=None, label3=None):
         """
         Extracts IP addresses that belong to Mirai zombie botnet.
 
@@ -232,8 +253,11 @@ class L4Parser(HoneypotParser):
         pool = multiprocessing.Pool(multiprocessing.cpu_count())
         # Process the log data using the _process_single_file_mirai method on 
         # each file in the specified filepath
-        res = pool.map(self._process_single_file_mirai, 
-                       glob.glob(self.filepath))
+        if not self.file_list:
+            res = pool.map(self._process_single_file_mirai, 
+                           glob.glob(self.filepath))
+        else:
+            res = pool.map(self._process_single_file_mirai, self.filepath.split(' '))
         # Close the process pool
         pool.close()
 

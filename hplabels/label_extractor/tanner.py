@@ -116,7 +116,7 @@ class TannerParser(HoneypotParser):
 
         return crawlers      
 
-    def _extract_zombie_log4j_label(self, label1, label2):
+    def _extract_zombie_log4j_label(self, label1=None, label2=None):
         """
         Extract labels related to zombie-log4j attacks from the log entries.
 
