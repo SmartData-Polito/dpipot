@@ -42,4 +42,4 @@ This tool provides a set of scripts for parsing and labeling the logs of honeypo
     Cowrie honeypot tried to download a file suing curl/wget/tftp
     - [ ] miner: TBD
 - [ ] *Dionaea* 
-    - [x] TBD
+    - [ ] TBD
