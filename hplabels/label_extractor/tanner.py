@@ -9,7 +9,7 @@ the Tanner honeypot. It provides methods for extracting labels related to
 crawlers and zombie-log4j attacks from the log data.
 """
 
-from .parser import HoneypotParser
+from parser import HoneypotParser
 import gzip
 from io import BytesIO
 import json
@@ -28,18 +28,6 @@ class TannerParser(HoneypotParser):
         outpath : str, optional
             The file path to save the extracted labels to. If not provided, 
             labels will not be saved to a file.
-
-        Methods
-        -------
-        load_log_file(filepath)
-            Load the log file and return a list of log entries as strings.
-        extract_labels()
-            Extract labels related to crawlers and zombie-log4j attacks from 
-            the log entries.
-        _extract_crawler_label(label1, label2)
-            Extract labels related to crawlers from the log entries.
-        _extract_zombie_log4j_label(label1, label2)
-            Extract labels related to zombie-log4j attacks from the log entries.
 
         """
         super().__init__(filepath, outpath)
@@ -60,8 +48,12 @@ class TannerParser(HoneypotParser):
 
         """
         # Read the bytes object into a file-like object
-        with gzip.open(filepath, 'rb') as f_in:
-            file_like_obj = BytesIO(f_in.read())
+        if filepath.endswith("gz"):
+            with gzip.open(filepath, 'rb') as f_in:
+                file_like_obj = BytesIO(f_in.read())
+        else:
+            with open(filepath, 'rb') as f_in:
+                file_like_obj = BytesIO(f_in.read())
 
         # Convert the data in the file-like object to a string
         data_string = file_like_obj.getvalue()
@@ -72,6 +64,59 @@ class TannerParser(HoneypotParser):
         logs = data_string.split('\n')
 
         return logs
+
+    def _extract_benign_scanners(self, label1='benign', label2='security'):
+        """
+        Extract labels related to benign scanners
+
+        Parameters
+        ----------
+        label1 : str, optional
+            The first label to use for the extracted IP addresses. The default
+            value is 'benign'.
+        label2 : str, optional
+            The second label to use for the extracted IP addresses. The default
+            value is 'security'.
+
+        Returns
+        -------
+        list
+            A list of tuples, where each tuple contains the extracted IP
+            address and labels for a single log entry.
+
+        """
+        # Extract the IP addresses of scanners from the logs
+        censys = []
+        paloalto = []
+        driftnet = []
+        ipip = []
+        for entry in self.logs:
+            try:
+                obj = json.loads(entry)
+                src_ip = obj['peer']['ip']
+
+                # Check if the entry contains 'robots.txt'
+                if 'censys' in entry:
+                    label = (src_ip, label1, label2, 'censys')
+                    if label not in censys:
+                        censys.append(label)
+                elif 'paloalto' in entry:
+                    label = (src_ip, label1, label2, 'paloalto')
+                    if label not in paloalto:
+                        paloalto.append(label)
+                elif 'internet-measurement' in entry:
+                    label = (src_ip, label1, label2, 'driftnet')
+                    if label not in driftnet:
+                        driftnet.append(label)
+                elif 'ipip.net' in entry:
+                    label = (src_ip, label1, label2, 'ipip')
+                    if label not in ipip:
+                        ipip.append(label)
+            except:
+                # Skip the entry if it can't be parsed as JSON
+                continue
+
+        return censys + paloalto + driftnet + ipip
 
     def _extract_crawler_label(self, label1='benign', label2='crawler'):
         """
@@ -98,23 +143,60 @@ class TannerParser(HoneypotParser):
         for entry in self.logs:
             try:
                 # Check if the entry contains 'robots.txt'
-                if 'robots.txt' in entry:
+                if 'robots.txt' in entry or 'GoogleBot' in entry:
                     # Parse the entry as JSON and extract the source IP address
                     obj = json.loads(entry)
                     src_ip = obj['peer']['ip']
 
-                    # Add the IP address to the list of crawlers if it's not 
-                    # '10.0.0.1'
-                    if src_ip != '10.0.0.1':
-                        label = (src_ip, label1, label2, f'unk_{label2}')
-                        # Get only unique senders
-                        if label not in crawlers:
-                            crawlers.append(label)
+                    # Add the IP address to the list of crawlers if it's not
+                    label = (src_ip, label1, label2, f'unk_{label2}')
+                    # Get only unique senders
+                    if label not in crawlers:
+                        crawlers.append(label)
             except:
                 # Skip the entry if it can't be parsed as JSON
                 continue
 
         return crawlers      
+
+    def _extract_zombie_shellshock_label(self, label1=None, label2=None):
+        """
+        Extract labels related to zombie-shellshock attacks from the log entries.
+
+        Parameters
+        ----------
+        label1 : str
+            The first label to use for the extracted IP addresses. The default
+            value is 'malicious'.
+        label2 : str, optional
+            The second label to use for the extracted IP addresses. The default
+            value is 'zombie'.
+
+        Returns
+        -------
+        list
+            A list of tuples, where each tuple contains the extracted IP
+            address and labels for a single log entry.
+
+        """
+        label1 = label1 or 'malicious'
+        label2 = label2 or 'zombie'
+
+        # Extract the IP addresses from the logs
+        shellshock = []
+        for entry in self.logs:
+            if '() { :; };' in entry:
+                # Parse the entry as JSON and extract the source IP address
+                obj = json.loads(entry)
+                src_ip = obj['peer']['ip']
+
+                # Add the IP address to the list of crawlers if it's not
+                label = (src_ip, label1, label2, 'shellshock')
+                # Get only unique senders
+                if label not in shellshock:
+                    shellshock.append(label)
+
+        return shellshock
 
     def _extract_zombie_log4j_label(self, label1=None, label2=None):
         """
@@ -142,19 +224,17 @@ class TannerParser(HoneypotParser):
         # Extract the IP addresses from the logs
         log4j = []
         for entry in self.logs:
-            # Check if the entry contains 'robots.txt'
-            if 'jndi:ldap' in entry:
+            if 'jndi:dns' in entry or \
+                    ('jndi' in entry and ('ldap' in entry or "l}${lower:d}a${lower:p}" in entry)):
                 # Parse the entry as JSON and extract the source IP address
                 obj = json.loads(entry)
                 src_ip = obj['peer']['ip']
 
                 # Add the IP address to the list of crawlers if it's not 
-                # '10.0.0.1'
-                if src_ip != '10.0.0.1':
-                    label = (src_ip, label1, label2, 'log4j')
-                    # Get only unique senders
-                    if label not in log4j:
-                        log4j.append(label)
+                label = (src_ip, label1, label2, 'log4j')
+                # Get only unique senders
+                if label not in log4j:
+                    log4j.append(label)
 
         return log4j
 
@@ -175,9 +255,13 @@ class TannerParser(HoneypotParser):
         crawler_ips = self._extract_crawler_label()
         # Extract the IP addresses labeled as zombie-log4j from the log data
         log4j_ips = self._extract_zombie_log4j_label()
-        
+        # Extract the IP addresses labeled as zombie-shellshock from the log data
+        shellshock_ips = self._extract_zombie_shellshock_label()
+        # Extract the IP addresses labeled as benign
+        benign = self._extract_benign_scanners()
+
         # Concatenate labels
-        tanner_all = crawler_ips + log4j_ips
+        tanner_all = crawler_ips + log4j_ips + shellshock_ips + benign
 
         # If an output file path has been specified, save the labels to file
         if self.outpath:

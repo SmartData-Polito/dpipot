@@ -9,11 +9,13 @@ the Cowrie honeypot. It provides methods for extracting labels related to
 exploiters and bruteforcers attacks from the log data.
 """
 
-from .parser import HoneypotParser
-import gzip
+from parser import HoneypotParser
 from io import BytesIO
-import json
 import pandas as pd
+import gzip
+import json
+
+MIN_FREQ = 10
 
 class CowrieParser(HoneypotParser):
     def __init__(self, filepath, outpath=None):
@@ -40,20 +42,6 @@ class CowrieParser(HoneypotParser):
         logs : list of str
             A list of strings representing the rows of the log file.
 
-        Methods
-        -------
-        load_log_file()
-            Load the log file from the specified file path.
-        _extract_bruteforcer_label(label1, label2, label3)
-            Extract IPs labeled as bruteforcer from the log data.
-        _extract_exploiter_label(label1, label2, label3)
-            Extract IPs labeled as exploiter from the log data.
-        extract_labels()
-            Extract labels from the log data.
-        _get_ips_frequency(labels)
-            Filter the IP addresses according to their frequency.
-
-
         """
         super().__init__(filepath, outpath)
 
@@ -73,8 +61,12 @@ class CowrieParser(HoneypotParser):
 
         """
         # Read the bytes object into a file-like object
-        with gzip.open(filepath, 'rb') as f_in:
-            file_like_obj = BytesIO(f_in.read())
+        if filepath.endswith("gz"):
+            with gzip.open(filepath, 'rb') as f_in:
+                file_like_obj = BytesIO(f_in.read())
+        else:
+            with open(filepath, 'rb') as f_in:
+                file_like_obj = BytesIO(f_in.read())
 
         # Convert the data in the file-like object to a string
         data_string = file_like_obj.getvalue()
@@ -105,14 +97,13 @@ class CowrieParser(HoneypotParser):
 
         """
         # Create a DataFrame from the list of bruteforcer IPs
-        df = pd.DataFrame(entries, columns=['src_ip', 'label1', 
-                                            'label2', 'label3'])
+        df = pd.DataFrame(entries, columns=['src_ip', 'label1', 'label2', 'label3'])
         # Count the number of occurrences of each IP address in the DataFrame
         ip_counts = df.value_counts('src_ip')
-        # Extract the IP addresses that occur at least 20 times
-        bf_ips = ip_counts[ip_counts >= 10].index
+        # Extract the IP addresses that occur at least MIN_FREQ times
+        bf_ips = ip_counts[ip_counts >= MIN_FREQ].index
         # Filter the DataFrame to include only the IP addresses that occur at 
-        # least 20 times
+        # least MIN_FREQ times
         filtered_df = df[df['src_ip'].isin(bf_ips)]
         # Remove duplicate rows from the DataFrame
         filtered_df = filtered_df.drop_duplicates()
@@ -159,11 +150,9 @@ class CowrieParser(HoneypotParser):
                     obj = json.loads(entry)
                     src_ip = obj['src_ip']
 
-                    # Add the IP address to the list of btuteforcers if it's 
-                    # not '10.0.0.1'
-                    if src_ip != '10.0.0.1':
-                        label = (src_ip, label1, label2, label3)
-                        bfs.append(label)
+                    # Add the IP address to the list of bruteforcers if it's
+                    label = (src_ip, label1, label2, label3)
+                    bfs.append(label)
             except:
                 # Skip the entry if it can't be parsed as JSON
                 continue
@@ -205,19 +194,19 @@ class CowrieParser(HoneypotParser):
         exploiters = []
         for entry in self.logs:
             try:
+                obj = json.loads(entry)
+                src_ip = obj['src_ip']
+                command = obj['input']
                 # Check if the IP downloaded a file
-                if 'download' in entry:
+                if 'wget' in command or 'curl' in command or 'tftp' in command:
                     # Parse the entry as JSON and extract the IP address
-                    obj = json.loads(entry)
-                    src_ip = obj['src_ip']
+
 
                     # Add the IP address to the list of exploiters if it's not 
-                    # '10.0.0.1'
-                    if src_ip != '10.0.0.1':
-                        label = (src_ip, label1, label2, label3)
-                        # Get only unique senders
-                        if label not in exploiters:
-                            exploiters.append(label)
+                    label = (src_ip, label1, label2, label3)
+                    # Get only unique senders
+                    if label not in exploiters:
+                        exploiters.append(label)
             except:
                 # Skip the entry if it can't be parsed as JSON
                 continue

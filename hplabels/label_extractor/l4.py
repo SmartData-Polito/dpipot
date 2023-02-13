@@ -12,7 +12,7 @@ zombie activity. The extracted labels can be saved to an output file if a
 filepath is provided when initializing an instance of the L4Parser class.
 """
 
-from .parser import HoneypotParser
+from parser import HoneypotParser
 import subprocess
 import multiprocessing
 import glob
@@ -42,18 +42,6 @@ class L4Parser(HoneypotParser):
         outpath : str
             Path to the output file.
         
-        Methods
-        -------
-        extract_labels()
-            Extract the labels from the log data.
-        _process_single_file_spam(fpath)
-            Processes a single file for extracting spammer labels.
-        _extract_spammer_label(label1, label2, label3)
-            Extracts spammer labels from the log data.
-        _process_single_file_mirai(fpath)
-            Extract the IP addresses of sources that have been flagged as Mirai
-        _extract_zombie_mirai_label(label1, label2, label3)
-            Extracts IP addresses that belong to Mirai zombie botnet.
         """
         self.filepath = filepath
         self.outpath = outpath

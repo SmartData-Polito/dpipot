@@ -15,7 +15,7 @@ file if a filepath is provided when initializing an instance of the
 `DionaeaParser` class.
 """
 
-from .parser import HoneypotParser
+from parser import HoneypotParser
 import os
 import pandas as pd
 
