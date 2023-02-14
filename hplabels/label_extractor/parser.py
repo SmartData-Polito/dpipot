@@ -108,3 +108,4 @@ class HoneypotParser:
         # Open the output file in write mode and write the data to it
         with open(self.outpath, 'w') as file:
             file.write(to_file)
+            file.write("\n")
