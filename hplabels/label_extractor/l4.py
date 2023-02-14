@@ -293,7 +293,11 @@ class L4Parser(HoneypotParser):
         # Parse the L4 layer log data and extract IPs labeled as spammer
         spammer_ips = self._extract_spammer_label()
         # Parse the L4 layer log data and extract IPs labeled as zombie-mirai
-        mirai_ips = self._extract_zombie_mirai_label()
+
+        try:
+            mirai_ips = self._extract_zombie_mirai_label()
+        except:
+            mirai_ips = []
         
         # Concatenate extracted labels
         l4_all = spammer_ips + mirai_ips
