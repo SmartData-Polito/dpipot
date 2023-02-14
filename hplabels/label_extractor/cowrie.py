@@ -277,11 +277,13 @@ class CowrieParser(HoneypotParser):
         """
         # Extract the IP addresses labeled as bruteforcer from the log data
         bfs_ips = self._extract_bruteforcer_label()
-        # Extract the IP addresses labeled as expliter from the log data
+        # Extract the IP addresses labeled as exploiters from the log data
         expl_ips = self._extract_exploiter_label()
+        # Extract the IP addresses labeled as miners from the log data
+        miners_ips = self._extract_miners_label()
         
         # Concatenate labels
-        cowrie_all = bfs_ips + expl_ips
+        cowrie_all = bfs_ips + expl_ips + miners_ips
 
         # If an output file path has been specified, save the labels to the file
         if self.outpath:
