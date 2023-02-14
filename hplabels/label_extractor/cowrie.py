@@ -249,7 +249,7 @@ class CowrieParser(HoneypotParser):
 
                 # command = obj['input']
                 # Check if the IP downloaded a file
-                if 'miner' in command or 'hive-passwd' in command:
+                if 'miner' in entry or 'hive-passwd' in entry:
                     # Parse the entry as JSON and extract the IP address
 
 
