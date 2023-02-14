@@ -213,6 +213,57 @@ class CowrieParser(HoneypotParser):
 
         return exploiters
 
+    def _extract_miners_label(self, label1=None, label2=None, label3=None):
+        """
+        Extract the IP addresses of miners from the logs.
+
+        Parameters
+        ----------
+        label1 : str, optional
+            The first label to be applied to the IP addresses of exploiters.
+            Defaults to 'malicious'.
+        label2 : str, optional
+            The second label to be applied to the IP addresses of exploiters.
+            Defaults to 'exploiter'.
+        label3 : str, optional
+            The third label to be applied to the IP addresses of exploiters.
+            Defaults to 'unk_miners'.
+
+        Returns
+        -------
+        list
+            A list of tuples containing IP addresses and labels for mining
+            activity.
+
+        """
+        label1 = label1 or 'malicious'
+        label2 = label2 or 'exploiter'
+        label3 = label3 or 'unk_miners'
+
+        # Extract the IP addresses of unk_miners from the logs
+        miners = []
+        for entry in self.logs:
+            try:
+                obj = json.loads(entry)
+                src_ip = obj['src_ip']
+
+                # command = obj['input']
+                # Check if the IP downloaded a file
+                if 'miner' in command or 'hive-passwd' in command:
+                    # Parse the entry as JSON and extract the IP address
+
+
+                    # Add the IP address to the list of miners if it's not
+                    label = (src_ip, label1, label2, label3)
+                    # Get only unique senders
+                    if label not in miners:
+                        miners.append(label)
+            except:
+                # Skip the entry if it can't be parsed as JSON
+                continue
+
+        return miners
+
     def extract_labels(self):
         """
         Extract labels from the log data.

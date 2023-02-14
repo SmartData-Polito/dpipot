@@ -19,6 +19,8 @@ from parser import HoneypotParser
 import os
 import pandas as pd
 
+MIN_FREQ = 10
+
 class DionaeaParser(HoneypotParser):
     def __init__(self, filepath, outpath=None):
         """
@@ -90,16 +92,14 @@ class DionaeaParser(HoneypotParser):
 
         # Get the index (i.e. the unique values in the 'remote_host' column) of 
         # rows where the count is greater than or equal to 10
-        bf_ips = preprocessed[preprocessed>=10].index
+        bf_ips = preprocessed[preprocessed >= MIN_FREQ].index
         bfs = []
 
         # Iterate over the IPs
         for ip in bf_ips:
-            # Ignore the local host IP
-            if ip != '10.0.0.1':
-                # Create a tuple containing the IP and its corresponding labels
-                label = (ip, label1, label2, label3)
-                bfs.append(label)
+            # Create a tuple containing the IP and its corresponding labels
+            label = (ip, label1, label2, label3)
+            bfs.append(label)
         
         # Remove the temporary file
         os.system(f'rm -rf /tmp/test.txt')
@@ -150,11 +150,9 @@ class DionaeaParser(HoneypotParser):
 
         # Iterate over the IPs
         for ip in ex_ips:
-            # Ignore the local host IP
-            if ip != '10.0.0.1':
-                # Create a tuple containing the IP and its corresponding labels
-                label = (ip, label1, label2, label3)
-                exs.append(label)
+            # Create a tuple containing the IP and its corresponding labels
+            label = (ip, label1, label2, label3)
+            exs.append(label)
 
         # Remove the temporary file
         os.system(f'rm -rf /tmp/test.txt')

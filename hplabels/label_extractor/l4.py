@@ -261,10 +261,7 @@ class L4Parser(HoneypotParser):
         # Group the dataframe by 'src_ip' and aggregate 'mirai' by sum and 
         # 'cnt' by count
         df = df.groupby('src_ip').agg({'mirai':sum, 'cnt':'count'})
-        # Filter the dataframe to only keep rows where the 'mirai' column is 
-        # not equal to '-', '0-', '1-', or '10-'
-        df = df[~df.mirai.isin(['-', '0-', '1-', '10-'])]
-        # Get a list of IP addresses where the 'mirai' column is equal to the 
+        # Get a list of IP addresses where the 'mirai' column is equal to the
         # 'cnt' column
         mirai_ips = df[df['mirai'] == df['cnt']].index
 
